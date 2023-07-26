@@ -1,0 +1,47 @@
+/* 古诗词卡片 */
+@font-face {
+    font-family: 'YunFengHanChan'; /*a name to be used later*/
+    src: url('/font/云峰寒蝉体.ttf'); /*URL to font*/
+}
+
+#card-poem{
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem!important;
+  min-height: 130px;
+}
+
+div#poem_sentence{
+  text-align: center;
+  font-family: YunFengHanChan;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+  padding: 1rem;
+  border-radius: 12px;
+  color:#fff;
+  background: #9b9ab8;
+  min-height: 62px;
+}
+
+div#poem_info{
+  display: flex;
+  color: #9b9ab8;
+  font-size: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+div#poem_author{
+  order: 1;
+  padding: 2px;
+  margin-left: 8px;
+}
+
+div#poem_dynasty{
+  order: 0;
+  padding: 2px 4px 2px 6px;
+  background: #9b9ab8;
+  color: #fff;
+  border-radius: 8px;
+}

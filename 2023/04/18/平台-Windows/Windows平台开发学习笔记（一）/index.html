@@ -1,0 +1,638 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>关于线程与进程的Windows-api | Jiege</title><meta name="keywords" content="Windows"><meta name="author" content="Jiege"><meta name="copyright" content="Jiege"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="¶一些常用的Windows-api ¶WSAGetLastError ¶用途 返回该线程进行的上一次 Windows Sockets API 函数调用时的错误代码 ¶函数原型 int WSAGetLastError ( ); ¶注意  当特定 Windows 套接字函数指示发生错误时，应立即调用WSAGetLastError以检索扩展错误代码。 如果函数调用的返回值指示错误或其他相关数据是在错误代">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于线程与进程的Windows-api">
+<meta property="og:url" content="https://115jiege.github.io/my-hexo-blog/2023/04/18/%E5%B9%B3%E5%8F%B0-Windows/Windows%E5%B9%B3%E5%8F%B0%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/index.html">
+<meta property="og:site_name" content="Jiege">
+<meta property="og:description" content="¶一些常用的Windows-api ¶WSAGetLastError ¶用途 返回该线程进行的上一次 Windows Sockets API 函数调用时的错误代码 ¶函数原型 int WSAGetLastError ( ); ¶注意  当特定 Windows 套接字函数指示发生错误时，应立即调用WSAGetLastError以检索扩展错误代码。 如果函数调用的返回值指示错误或其他相关数据是在错误代">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://115jiege.github.io/my-hexo-blog/img/cover_p.jpg">
+<meta property="article:published_time" content="2023-04-18T06:34:21.000Z">
+<meta property="article:modified_time" content="2023-04-23T02:05:57.000Z">
+<meta property="article:author" content="Jiege">
+<meta property="article:tag" content="Windows">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://115jiege.github.io/my-hexo-blog/img/cover_p.jpg"><link rel="shortcut icon" href="/my-hexo-blog/img/logo.png"><link rel="canonical" href="https://115jiege.github.io/my-hexo-blog/2023/04/18/%E5%B9%B3%E5%8F%B0-Windows/Windows%E5%B9%B3%E5%8F%B0%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/my-hexo-blog/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/my-hexo-blog/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":150},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: Jiege","link":"链接: ","source":"来源: Jiege","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-04-23 10:05:57'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const fontSizeVal = saveToLocal.get('global-font-size')
+    if (fontSizeVal !== undefined) {
+      document.documentElement.style.setProperty('--global-font-size', fontSizeVal + 'px')
+    }
+    })(window)</script><link rel="stylesheet" href="/css/mycss.css"><link rel="stylesheet" href="/css/custom.css"  media="defer" onload="this.media='all'"><link rel="stylesheet" href="/css/iconfont-official.css"><link rel="stylesheet" href="/css/mouse.css"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/js-heo@1.0.11/mainColor/heoMainColor.css"><link rel="stylesheet" type="text/css" href="/css/poem.css"><svg aria-hidden="true" style="position:absolute; overflow:hidden; width:0; height:0"><symbol id="icon-sun" viewBox="0 0 1024 1024"><path d="M960 512l-128 128v192h-192l-128 128-128-128H192v-192l-128-128 128-128V192h192l128-128 128 128h192v192z" fill="#FFD878" p-id="8420"></path><path d="M736 512a224 224 0 1 0-448 0 224 224 0 1 0 448 0z" fill="#FFE4A9" p-id="8421"></path><path d="M512 109.248L626.752 224H800v173.248L914.752 512 800 626.752V800h-173.248L512 914.752 397.248 800H224v-173.248L109.248 512 224 397.248V224h173.248L512 109.248M512 64l-128 128H192v192l-128 128 128 128v192h192l128 128 128-128h192v-192l128-128-128-128V192h-192l-128-128z" fill="#4D5152" p-id="8422"></path><path d="M512 320c105.888 0 192 86.112 192 192s-86.112 192-192 192-192-86.112-192-192 86.112-192 192-192m0-32a224 224 0 1 0 0 448 224 224 0 0 0 0-448z" fill="#4D5152" p-id="8423"></path></symbol><symbol id="icon-moon" viewBox="0 0 1024 1024"><path d="M611.370667 167.082667a445.013333 445.013333 0 0 1-38.4 161.834666 477.824 477.824 0 0 1-244.736 244.394667 445.141333 445.141333 0 0 1-161.109334 38.058667 85.077333 85.077333 0 0 0-65.066666 135.722666A462.08 462.08 0 1 0 747.093333 102.058667a85.077333 85.077333 0 0 0-135.722666 65.024z" fill="#FFB531" p-id="11345"></path><path d="M329.728 274.133333l35.157333-35.157333a21.333333 21.333333 0 1 0-30.165333-30.165333l-35.157333 35.157333-35.114667-35.157333a21.333333 21.333333 0 0 0-30.165333 30.165333l35.114666 35.157333-35.114666 35.157334a21.333333 21.333333 0 1 0 30.165333 30.165333l35.114667-35.157333 35.157333 35.157333a21.333333 21.333333 0 1 0 30.165333-30.165333z" fill="#030835" p-id="11346"></path></symbol></svg><!-- hexo injector head_end start --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Zfour/Butterfly-card-history/baiduhistory/css/main.css"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.2.0"><link rel="alternate" href="/my-hexo-blog/atom.xml" title="Jiege" type="application/atom+xml">
+</head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="wizard-scene"><div class="wizard-objects"><div class="wizard-square"></div><div class="wizard-circle"></div><div class="wizard-triangle"></div></div><div class="wizard"><div class="wizard-body"></div><div class="wizard-right-arm"><div class="wizard-right-hand"></div></div><div class="wizard-left-arm"><div class="wizard-left-hand"></div></div><div class="wizard-head"><div class="wizard-beard"></div><div class="wizard-face"><div class="wizard-adds"></div></div><div class="wizard-hat"><div class="wizard-hat-of-the-hat"></div><div class="wizard-four-point-star --first"></div><div class="wizard-four-point-star --second"></div><div class="wizard-four-point-star --third"></div></div></div></div></div></div><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="/my-hexo-blog/img/avatar.jpg" onerror="onerror=null;src='/img/cover_p.jpeg'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/my-hexo-blog/archives/"><div class="headline">文章</div><div class="length-num">35</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/my-hexo-blog/tags/"><div class="headline">标签</div><div class="length-num">34</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/my-hexo-blog/categories/"><div class="headline">分类</div><div class="length-num">9</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/my-hexo-blog/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/my-hexo-blog/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/my-hexo-blog/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/my-hexo-blog/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/my-hexo-blog/air_conditioner/"><i class="fa-fw fa fa-heartbeat"></i><span> 空调</span></a></div><div class="menus_item"><a class="site-page" href="/my-hexo-blog/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div><div class="menus_item"><a class="site-page" href="/my-hexo-blog/bilibili/"><i class="fa-fw iconfont icon-bilibili"></i><span> 追番</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/my-hexo-blog/img/cover_p.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/my-hexo-blog/">Jiege</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/my-hexo-blog/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/my-hexo-blog/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/my-hexo-blog/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/my-hexo-blog/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/my-hexo-blog/air_conditioner/"><i class="fa-fw fa fa-heartbeat"></i><span> 空调</span></a></div><div class="menus_item"><a class="site-page" href="/my-hexo-blog/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div><div class="menus_item"><a class="site-page" href="/my-hexo-blog/bilibili/"><i class="fa-fw iconfont icon-bilibili"></i><span> 追番</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">关于线程与进程的Windows-api</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-04-18T06:34:21.000Z" title="发表于 2023-04-18 14:34:21">2023-04-18</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-04-23T02:05:57.000Z" title="更新于 2023-04-23 10:05:57">2023-04-23</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/my-hexo-blog/categories/%E5%B9%B3%E5%8F%B0-Windows/">平台-Windows</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.9k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>6分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="关于线程与进程的Windows-api"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="一些常用的Windows-api"><a class="header-anchor" href="#一些常用的Windows-api">¶</a>一些常用的Windows-api</h2>
+<h3 id="WSAGetLastError"><a class="header-anchor" href="#WSAGetLastError">¶</a>WSAGetLastError</h3>
+<h4 id="用途"><a class="header-anchor" href="#用途">¶</a>用途</h4>
+<p>返回该线程进行的上一次 Windows Sockets API 函数调用时的错误代码</p>
+<h4 id="函数原型"><a class="header-anchor" href="#函数原型">¶</a>函数原型</h4>
+<p>int WSAGetLastError ( );</p>
+<h4 id="注意"><a class="header-anchor" href="#注意">¶</a>注意</h4>
+<ol>
+<li>当特定 Windows 套接字函数指示发生错误时，应立即调用<strong>WSAGetLastError</strong>以检索扩展错误代码。</li>
+<li>如果函数调用的返回值指示错误或其他相关数据是在错误代码中返回的，则应立即调用 <strong>WSAGetLastError</strong> ，否则，某些函数可能会将最后一个扩展错误代码重置为 0</li>
+<li>使用 <a target="_blank" rel="noopener" href="https://learn.microsoft.com/zh-cn/windows/desktop/api/winsock/nf-winsock-wsasetlasterror">WSASetLastError</a> 函数重置扩展错误代码，并将 <em>iError</em> 参数设置为零。 使用 <em>SO_ERROR optname</em> 参数调用的 <a target="_blank" rel="noopener" href="https://learn.microsoft.com/zh-cn/windows/desktop/api/winsock/nf-winsock-getsockopt">getsockopt</a> 函数也会将扩展错误代码重置为零。</li>
+<li>不应使用 <strong>WSAGetLastError</strong> 函数在收到异步消息时检查扩展错误值。 在这种情况下，扩展错误值在消息的 <em>lParam</em> 参数中传递，这可能与 <strong>WSAGetLastError</strong> 返回的值不同。</li>
+<li><strong>WSAGetLastError</strong> 函数是 Winsock 2.2 DLL 中唯一可在 <strong>WSAStartup</strong> 失败时调用的函数之一。</li>
+</ol>
+<h4 id="要求"><a class="header-anchor" href="#要求">¶</a>要求</h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>最低支持的客户端</td>
+<td>windows8.1 Windows Vista</td>
+</tr>
+<tr>
+<td>最低支持的服务端</td>
+<td>Windows server 2003</td>
+</tr>
+<tr>
+<td>标头</td>
+<td>winsock.h</td>
+</tr>
+<tr>
+<td>Library</td>
+<td>Ws2_32.lib</td>
+</tr>
+<tr>
+<td>DLL</td>
+<td>Ws2_32.dll</td>
+</tr>
+</tbody>
+</table>
+<h3 id="beginthread、beginthreadex"><a class="header-anchor" href="#beginthread、beginthreadex">¶</a>beginthread、beginthreadex</h3>
+<h4 id="用途-v2"><a class="header-anchor" href="#用途-v2">¶</a>用途</h4>
+<p>用于创建线程</p>
+<h4 id="语法"><a class="header-anchor" href="#语法">¶</a>语法</h4>
+<figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">typedef void     (<span class="variable">__cdecl</span>*   <span class="variable">_beginthread_proc_type</span>  )(void*);</span><br><span class="line">typedef unsigned (<span class="variable">__stdcall</span>* <span class="variable">_beginthreadex_proc_type</span>)(void*);</span><br><span class="line"></span><br><span class="line"><span class="variable">_ACRTIMP</span> uintptr_t <span class="variable">__cdecl</span> <span class="variable">_beginthread</span>(</span><br><span class="line">    <span class="variable">_In_</span>     <span class="variable">_beginthread_proc_type</span> <span class="variable">_StartAddress</span>,</span><br><span class="line">    <span class="variable">_In_</span>     unsigned               <span class="variable">_StackSize</span>,</span><br><span class="line">    <span class="variable">_In_opt_</span> void*                  <span class="variable">_ArgList</span></span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line"><span class="variable">_ACRTIMP</span> uintptr_t <span class="variable">__cdecl</span> <span class="variable">_beginthreadex</span>(</span><br><span class="line">    <span class="variable">_In_opt_</span>  void*                    <span class="variable">_Security</span>,</span><br><span class="line">    <span class="variable">_In_</span>      unsigned                 <span class="variable">_StackSize</span>,</span><br><span class="line">    <span class="variable">_In_</span>      <span class="variable">_beginthreadex_proc_type</span> <span class="variable">_StartAddress</span>,</span><br><span class="line">    <span class="variable">_In_opt_</span>  void*                    <span class="variable">_ArgList</span>,</span><br><span class="line">    <span class="variable">_In_</span>      unsigned                 <span class="variable">_InitFlag</span>,</span><br><span class="line">    <span class="variable">_Out_opt_</span> unsigned*                <span class="variable">_ThrdAddr</span></span><br><span class="line">    );</span><br></pre></td></tr></table></figure>
+<h4 id="参数"><a class="header-anchor" href="#参数">¶</a>参数</h4>
+<p><em><code>Security</code></em></p>
+<p>指向 <a target="_blank" rel="noopener" href="https://learn.microsoft.com/zh-cn/previous-versions/windows/desktop/legacy/aa379560(v=vs.85)"><code>SECURITY_ATTRIBUTES</code></a> 结构的指针，此结构确定返回的句柄是否由子进程继承。 <code>Security</code>为<code>NULL</code>表示默认安全性，无法继承句柄。</p>
+<p><em><code>StackSize</code></em></p>
+<p>新线程的堆栈大小，一般默认为0</p>
+<p><em><code>StartAddress</code></em></p>
+<p>启动开始执行新线程的例程的地址，对于 <strong><code>_beginthread</code></strong>，调用约定是 <a target="_blank" rel="noopener" href="https://learn.microsoft.com/zh-cn/cpp/cpp/cdecl?view=msvc-170"><code>__cdecl</code></a> （本机代码) ，或者是 <a target="_blank" rel="noopener" href="https://learn.microsoft.com/zh-cn/cpp/cpp/clrcall?view=msvc-170"><code>__clrcall</code></a> （托管代码) 。 对于 <strong><code>_beginthreadex</code></strong>，调用约定是 <a target="_blank" rel="noopener" href="https://learn.microsoft.com/zh-cn/cpp/cpp/stdcall?view=msvc-170"><code>__stdcall</code></a> （本机代码) ，或者是 <a target="_blank" rel="noopener" href="https://learn.microsoft.com/zh-cn/cpp/cpp/clrcall?view=msvc-170"><code>__clrcall</code></a> （托管代码) 。</p>
+<p><em><code>ArgList</code></em></p>
+<p>要传递到新线程的参数列表or <code>NULL</code></p>
+<p><em><code>InitFlag</code></em></p>
+<p>控制新线程的初始状态的标志。</p>
+<p>设置为 0 则立即运行，</p>
+<p>设置为 <code>CREATE_SUSPENDED</code>则创建后挂起,使用 <a target="_blank" rel="noopener" href="https://learn.microsoft.com/zh-cn/windows/win32/api/processthreadsapi/nf-processthreadsapi-resumethread"><code>ResumeThread</code></a> 来执行此线程。</p>
+<p><em><code>ThrdAddr</code></em></p>
+<p>存放线程标识符，它是CreateThread函数中的线程ID</p>
+<h4 id="区别"><a class="header-anchor" href="#区别">¶</a>区别</h4>
+<ol>
+<li>参数形式不同</li>
+<li><code>ex</code>能够创建悬挂状态线程，在nt中能够指定级别，能够被<code>thrdaddr</code>访问，因为它有了<code>id</code>。</li>
+<li><code>ex</code>使用<code>__stdcall</code>调用格式，必须返回<code>exit code</code>。</li>
+<li><code>ex</code>返回0代表失败，原先的返回-1L。</li>
+<li><code>ex</code>创建的必须用ex销毁</li>
+</ol>
+<h3 id="endthread、endthreadex"><a class="header-anchor" href="#endthread、endthreadex">¶</a>endthread、endthreadex</h3>
+<h4 id="用途-v3"><a class="header-anchor" href="#用途-v3">¶</a>用途</h4>
+<p>用于结束线程终止线程；<strong><code>_endthread</code></strong> 终止由 <strong><code>_beginthread</code></strong> 创建的线程，<strong><code>_endthreadex</code></strong> 终止由 <strong><code>_beginthreadex</code></strong> 创建的线程。</p>
+<p>语法</p>
+<figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*释放线程空间、释放线程TLS空间、调用ExiteThread结束线程。*/</span></span><br><span class="line"><span class="variable">_ACRTIMP</span> void <span class="variable">__cdecl</span> <span class="variable">_endthread</span>(void);</span><br><span class="line"></span><br><span class="line"><span class="comment">// retval:设定的线程结束码，与ExiteThread函数的参数功能一样，</span></span><br><span class="line"><span class="comment">//其实这个函数释放线程TLS空间，再调用ExiteThread函数，但没有释放线程空间。</span></span><br><span class="line"><span class="variable">_ACRTIMP</span> void <span class="variable">__cdecl</span> <span class="variable">_endthreadex</span>(</span><br><span class="line">    <span class="variable">_In_</span> unsigned <span class="variable">_ReturnCode</span></span><br><span class="line">    );</span><br></pre></td></tr></table></figure>
+<h4 id="参数-v2"><a class="header-anchor" href="#参数-v2">¶</a>参数</h4>
+<p><em><code>retval</code></em>  线程退出代码</p>
+<h4 id="注意-v2"><a class="header-anchor" href="#注意-v2">¶</a>注意</h4>
+<ol>
+<li>当线程从作为 <strong><code>_endthread</code></strong> 或 <strong><code>_endthreadex</code></strong> 参数传递的例程中返回时，会自动调用 <strong><code>_beginthread</code></strong> 或 <strong><code>_beginthreadex</code></strong>。这有助于适当恢复为线程分配的资源。</li>
+<li><strong><code>_endthread</code></strong> 会自动关闭线程句柄。</li>
+<li><strong><code>_endthreadex</code></strong> 不会关闭线程句柄，所以使用 <strong><code>_beginthreadex</code></strong> 和 <strong><code>_endthreadex</code></strong> 时，必须通过调用 Win32 <code>CloseHandle</code> API 来关闭线程句柄。</li>
+<li>对于与 Libcmt.lib 链接的可执行文件，请不要调用 Win32 <a target="_blank" rel="noopener" href="https://learn.microsoft.com/zh-cn/windows/win32/api/processthreadsapi/nf-processthreadsapi-exitthread"><code>ExitThread</code></a> API；这将阻止运行时系统回收已分配的资源。</li>
+<li><strong><code>_endthread</code></strong> 和 <strong><code>_endthreadex</code></strong> 会导致 C++ 析构函数在不会调用的线程中处于挂起状态。</li>
+</ol>
+<h3 id="WaitForSingleObject"><a class="header-anchor" href="#WaitForSingleObject">¶</a>WaitForSingleObject</h3>
+<h4 id="用途-v4"><a class="header-anchor" href="#用途-v4">¶</a>用途</h4>
+<p>等待指定对象处于信号状态或超时间隔已过。</p>
+<p><em>如果要等待多个对象则使用 <a target="_blank" rel="noopener" href="https://learn.microsoft.com/zh-cn/windows/desktop/api/synchapi/nf-synchapi-waitformultipleobjects">WaitForMultipleObjects</a></em></p>
+<h4 id="语法-v2"><a class="header-anchor" href="#语法-v2">¶</a>语法</h4>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">DWORD WaitForSingleObject(</span><br><span class="line"><span class="string">  [in]</span> HANDLE hHandle,</span><br><span class="line"><span class="string">  [in]</span> DWORD  dwMilliseconds</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<h4 id="参数-v3"><a class="header-anchor" href="#参数-v3">¶</a>参数</h4>
+<p><em><code>[in] hHandle</code></em></p>
+<p>传递一个内核对象句柄，该句柄标识一个内核对象，句柄必须具有 <strong>SYNCHRONIZE</strong> 访问权限。</p>
+<p>如果该内核对象处于未通知状态，则该函数导致线程进入<strong>阻塞状态</strong>；如果该内核对象处于已通知状态，则该函数立即返回WAIT_OBJECT_0</p>
+<p><em><code>[in] dwMilliseconds</code></em></p>
+<p>超时间隔（以毫秒为单位）。</p>
+<p>如果指定了非零值，该函数将等待对象发出信号或间隔。</p>
+<p>如果 <em>dwMilliseconds</em> 为零，则如果对象未发出信号，则函数不会输入等待状态;它始终会立即返回。</p>
+<p>如果 <em>dwMilliseconds</em> 为 <strong>INFINITE</strong>，则仅当发出对象信号时，该函数才会返回。</p>
+<h4 id="返回值"><a class="header-anchor" href="#返回值">¶</a>返回值</h4>
+<table>
+<thead>
+<tr>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WAIT_OBJECT_0<br>0x00000080L</td>
+<td>等待的对象有信号（对线程来说，表示执行结束）</td>
+</tr>
+<tr>
+<td>WAIT_TIMEOUT<br>0x00000000L</td>
+<td>等待指定时间内，对象一直没有信号（线程没执行完)</td>
+</tr>
+<tr>
+<td>WAIT_ABANDONED<br>0x00000102L</td>
+<td>对象有信号，但还是不能执行 一般是因为未获取到锁或其他原因</td>
+</tr>
+<tr>
+<td>WAIT_FAILED<br>(DWORD) 0xFFFFFFFF</td>
+<td>函数失败。 要获得更多的错误信息，请调用 GetLastError。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="TerminateThread"><a class="header-anchor" href="#TerminateThread">¶</a>TerminateThread</h3>
+<h4 id="用途-v5"><a class="header-anchor" href="#用途-v5">¶</a>用途</h4>
+<p>在线程外终止一个线程，用于强制终止线程。</p>
+<h4 id="语法-v3"><a class="header-anchor" href="#语法-v3">¶</a>语法</h4>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">BOOL <span class="constructor">TerminateThread( HANDLE <span class="params">hThread</span>, DWORD <span class="params">dwExitCode</span>)</span>;</span><br></pre></td></tr></table></figure>
+<h4 id="参数-v4"><a class="header-anchor" href="#参数-v4">¶</a>参数</h4>
+<p><em><code>hThread</code></em></p>
+<p>被终止的线程的句柄</p>
+<p><em><code>dwExitCode</code></em></p>
+<p>退出码</p>
+<h4 id="返回值-v2"><a class="header-anchor" href="#返回值-v2">¶</a>返回值</h4>
+<p>函数执行成功则返回非零值，执行失败返回0。调用getlasterror获得返回的值</p>
+<h4 id="要求-v2"><a class="header-anchor" href="#要求-v2">¶</a>要求</h4>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>最低支持的客户端</td>
+<td>Windows XP</td>
+</tr>
+<tr>
+<td>最低支持的服务端</td>
+<td>Windows server 2003</td>
+</tr>
+<tr>
+<td>标头</td>
+<td>processthreadsapi.h</td>
+</tr>
+<tr>
+<td>Library</td>
+<td>Kernel32.lib</td>
+</tr>
+<tr>
+<td>DLL</td>
+<td>Kernel32.dll</td>
+</tr>
+</tbody>
+</table>
+<h4 id="注意-v3"><a class="header-anchor" href="#注意-v3">¶</a>注意</h4>
+<ol>
+<li>如果目标线程拥有关键部分，则不会释放关键部分。</li>
+<li>如果目标线程从堆分配内存，则不会释放堆锁。</li>
+<li>如果目标线程在终止时正在执行某些 kernel32 调用，则线程进程的 kernel32 状态可能不一致。</li>
+<li>如果目标线程正在操作共享 DLL 的全局状态，可能会销毁 DLL 的状态，从而影响 DLL 的其他用户。</li>
+<li>如果目标线程是调用此函数时进程的最后一个线程，则线程的进程也会终止。线程对象的状态会发出信号，释放等待线程终止的任何其他线程。 线程的终止状态从 <strong>STILL_ACTIVE</strong> 更改为 <em>dwExitCode</em> 参数的值。</li>
+<li>终止线程不一定从系统中删除线程对象。 关闭最后一个线程句柄时，将删除线程对象。</li>
+</ol>
+<h3 id="GetBestInterfaceEx"><a class="header-anchor" href="#GetBestInterfaceEx">¶</a>GetBestInterfaceEx</h3>
+<h4 id="用途-v6"><a class="header-anchor" href="#用途-v6">¶</a>用途</h4>
+<p>检索具有指向指定 IPv4 或 IPv6 地址的最佳路由的接口的索引</p>
+<h4 id="语法-v4"><a class="header-anchor" href="#语法-v4">¶</a>语法</h4>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">BOOL <span class="constructor">GetBestInterfaceEx(<span class="params">int</span> <span class="operator">*</span><span class="params">pIndex</span>, <span class="params">int</span> <span class="params">maxSize</span>, <span class="params">char</span> <span class="operator">*</span><span class="params">pGateway</span>)</span>;</span><br></pre></td></tr></table></figure>
+<h4 id="参数-v5"><a class="header-anchor" href="#参数-v5">¶</a>参数</h4>
+<p><em><code>[in] pIndex</code></em></p>
+<p>要为其检索具有最佳路由的接口的目标 IPv6 或 IPv4 地址</p>
+<p><em><code>[in] maxSize</code></em></p>
+<p>地址最大长度</p>
+<p><code>[out] pdwBestIfIndex</code></p>
+<p><em>pIndex</em> 指定的 IPv6 或 IPv4 地址的最佳路由。</p>
+<h3 id="WSASocketA"><a class="header-anchor" href="#WSASocketA">¶</a>WSASocketA</h3>
+<h4 id="用途-v7"><a class="header-anchor" href="#用途-v7">¶</a>用途</h4>
+<p>创建绑定到特定传输服务提供程序的套接字</p>
+<h4 id="语法-v5"><a class="header-anchor" href="#语法-v5">¶</a>语法</h4>
+<figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">SOCKET WSAAPI WSASocketA(</span><br><span class="line">    <span class="variable">_In_</span> int af,</span><br><span class="line">    <span class="variable">_In_</span> int <span class="built_in">type</span>,</span><br><span class="line">    <span class="variable">_In_</span> int protocol,</span><br><span class="line">    <span class="variable">_In_opt_</span> LPWSAPROTOCOL_INFOA lpProtocolInfo,</span><br><span class="line">    <span class="variable">_In_</span> <span class="built_in">GROUP</span> g,</span><br><span class="line">    <span class="variable">_In_</span> DWORD dwFlags</span><br><span class="line">    );</span><br></pre></td></tr></table></figure>
+<p><em><code>[in] af</code></em></p>
+<p>地址系列规范</p>
+<table>
+<thead>
+<tr>
+<th>af</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AF_UNSPEC</td>
+<td></td>
+</tr>
+<tr>
+<td><br>0</td>
+<td>未指定地址系列</td>
+</tr>
+<tr>
+<td>AF_INET</td>
+<td></td>
+</tr>
+<tr>
+<td><br>2</td>
+<td>指定IPV4地址系列</td>
+</tr>
+<tr>
+<td>AF_IPX</td>
+<td></td>
+</tr>
+<tr>
+<td><br>6</td>
+<td>指定IPX/SPX 地址系列</td>
+</tr>
+<tr>
+<td>AF_APPLETALK</td>
+<td></td>
+</tr>
+<tr>
+<td><br>16</td>
+<td>指定AppleTalk 地址系列</td>
+</tr>
+<tr>
+<td>AF_NETBIOS</td>
+<td></td>
+</tr>
+<tr>
+<td><br>17</td>
+<td>指定NetBIOS 地址系列<br>Windows 32位系统</td>
+</tr>
+<tr>
+<td>AF_INET6</td>
+<td></td>
+</tr>
+<tr>
+<td><br>23</td>
+<td>指定I9V6地址系列</td>
+</tr>
+<tr>
+<td>AF_IRDA</td>
+<td></td>
+</tr>
+<tr>
+<td><br>26</td>
+<td>指定红外数据关联 (IrDA) 地址系列</td>
+</tr>
+<tr>
+<td>AF_BTH</td>
+<td></td>
+</tr>
+<tr>
+<td><br>32</td>
+<td>指定蓝牙地址系列</td>
+</tr>
+</tbody>
+</table>
+<p><em><code>[in] type</code></em></p>
+<p>新套接字的类型规范</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SOCK_STREAM</td>
+<td></td>
+</tr>
+<tr>
+<td><br>1</td>
+<td>对应TCP</td>
+</tr>
+<tr>
+<td>SOCK_DGRAM</td>
+<td></td>
+</tr>
+<tr>
+<td><br>2</td>
+<td>对应UDP</td>
+</tr>
+<tr>
+<td>SOCK_RAW</td>
+<td></td>
+</tr>
+<tr>
+<td><br>3</td>
+<td>提供原始套接字的套接字类型，允许应用程序操作下一层协议标头。 若要操作 IPv4 标头，必须在套接字上设置 IP_HDRINCL 套接字选项。 若要操作 IPv6 标头，必须在套接字上设置 IPV6_HDRINCL 套接字选项。</td>
+</tr>
+<tr>
+<td>SOCK_RDM</td>
+<td></td>
+</tr>
+<tr>
+<td><br>4</td>
+<td>对应多播</td>
+</tr>
+<tr>
+<td>SOCK_SEQPACKET</td>
+<td></td>
+</tr>
+<tr>
+<td><br>5</td>
+<td>提供基于数据报的伪流数据包的套接字类型。</td>
+</tr>
+</tbody>
+</table>
+<p><em><code>[in] protocol</code></em></p>
+<p>使用的协议</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">Jiege</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://115jiege.github.io/my-hexo-blog/2023/04/18/%E5%B9%B3%E5%8F%B0-Windows/Windows%E5%B9%B3%E5%8F%B0%E5%BC%80%E5%8F%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/">https://115jiege.github.io/my-hexo-blog/2023/04/18/平台-Windows/Windows平台开发学习笔记（一）/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://115jiege.github.io/my-hexo-blog" target="_blank">Jiege</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/my-hexo-blog/tags/Windows/">Windows</a></div><div class="post_share"><div class="social-share" data-image="/my-hexo-blog/img/cover_p.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/my-hexo-blog/2023/04/18/%E5%B9%B3%E5%8F%B0-android/%E4%BD%BF%E7%94%A8Android%E6%A8%A1%E6%8B%9F%E5%99%A8/"><img class="prev-cover" src="https://cdn.pixabay.com/photo/2019/04/04/15/17/smartphone-4103051_960_720.jpg" onerror="onerror=null;src='/my-hexo-blog/img/cover_p.jpeg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">使用Android模拟器</div></div></a></div><div class="next-post pull-right"><a href="/my-hexo-blog/2023/04/21/tips%E6%95%B4%E7%90%86/libsodium.so%E5%90%84%E5%B9%B3%E5%8F%B0%E7%BC%96%E8%AF%91/"><img class="next-cover" src="https://cdn.pixabay.com/photo/2016/06/09/17/45/hacker-1446193_960_720.jpg" onerror="onerror=null;src='/my-hexo-blog/img/cover_p.jpeg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">sodium各平台编译</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span> 相关推荐</span></div><div class="relatedPosts-list"><div><a href="/my-hexo-blog/2023/06/08/平台-Windows/Windows开发——管理系统服务/" title="Windows开发——管理系统服务 "><img class="cover" src="https://cdn.pixabay.com/photo/2017/12/08/10/35/employee-3005501_640.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-06-08</div><div class="title">Windows开发——管理系统服务 </div></div></a></div><div><a href="/my-hexo-blog/2023/05/05/平台-Windows/u盘文件系统变为RAW/" title="u盘格式错误"><img class="cover" src="https://cdn.pixabay.com/photo/2017/01/09/12/49/mistake-1966448__340.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-05-05</div><div class="title">u盘格式错误</div></div></a></div><div><a href="/my-hexo-blog/2023/05/12/平台-Windows/使用U盘重装Win10系统/" title="使用U盘重装Win10系统"><img class="cover" src="/my-hexo-blog/img/cover_p.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-05-12</div><div class="title">使用U盘重装Win10系统</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="/my-hexo-blog/img/avatar.jpg" onerror="this.onerror=null;this.src='/my-hexo-blog/img/cover_p.jpeg'" alt="avatar"/><div class="author-info__name">Jiege</div><div class="author-info__description">美丽杰哥的个人博客</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/my-hexo-blog/archives/"><div class="headline">文章</div><div class="length-num">35</div></a></div><div class="card-info-data-item is-center"><a href="/my-hexo-blog/tags/"><div class="headline">标签</div><div class="length-num">34</div></a></div><div class="card-info-data-item is-center"><a href="/my-hexo-blog/categories/"><div class="headline">分类</div><div class="length-num">9</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/115Jiege"><i class="fab fa-github"></i><span>Github</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/115Jiege" target="_blank" title="Github"><i class="fab fa-github"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">Jiege's blog~</div></div><div class="card-widget card-netmusic"><div class="card-content"><div class="item-headline"><i class="fas fa-music" aria-hidden="true"></i><span>背景音乐</span><iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=100% height=86 src="//music.163.com/outchain/player?type=2&id=2034615687&auto=1&height=66"></iframe></div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E7%9A%84Windows-api"><span class="toc-number">1.</span> <span class="toc-text">一些常用的Windows-api</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#WSAGetLastError"><span class="toc-number">1.1.</span> <span class="toc-text">WSAGetLastError</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%94%A8%E9%80%94"><span class="toc-number">1.1.1.</span> <span class="toc-text">用途</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%87%BD%E6%95%B0%E5%8E%9F%E5%9E%8B"><span class="toc-number">1.1.2.</span> <span class="toc-text">函数原型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F"><span class="toc-number">1.1.3.</span> <span class="toc-text">注意</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A6%81%E6%B1%82"><span class="toc-number">1.1.4.</span> <span class="toc-text">要求</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#beginthread%E3%80%81beginthreadex"><span class="toc-number">1.2.</span> <span class="toc-text">beginthread、beginthreadex</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%94%A8%E9%80%94-v2"><span class="toc-number">1.2.1.</span> <span class="toc-text">用途</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AF%AD%E6%B3%95"><span class="toc-number">1.2.2.</span> <span class="toc-text">语法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%82%E6%95%B0"><span class="toc-number">1.2.3.</span> <span class="toc-text">参数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8C%BA%E5%88%AB"><span class="toc-number">1.2.4.</span> <span class="toc-text">区别</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#endthread%E3%80%81endthreadex"><span class="toc-number">1.3.</span> <span class="toc-text">endthread、endthreadex</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%94%A8%E9%80%94-v3"><span class="toc-number">1.3.1.</span> <span class="toc-text">用途</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%82%E6%95%B0-v2"><span class="toc-number">1.3.2.</span> <span class="toc-text">参数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F-v2"><span class="toc-number">1.3.3.</span> <span class="toc-text">注意</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#WaitForSingleObject"><span class="toc-number">1.4.</span> <span class="toc-text">WaitForSingleObject</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%94%A8%E9%80%94-v4"><span class="toc-number">1.4.1.</span> <span class="toc-text">用途</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AF%AD%E6%B3%95-v2"><span class="toc-number">1.4.2.</span> <span class="toc-text">语法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%82%E6%95%B0-v3"><span class="toc-number">1.4.3.</span> <span class="toc-text">参数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%94%E5%9B%9E%E5%80%BC"><span class="toc-number">1.4.4.</span> <span class="toc-text">返回值</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TerminateThread"><span class="toc-number">1.5.</span> <span class="toc-text">TerminateThread</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%94%A8%E9%80%94-v5"><span class="toc-number">1.5.1.</span> <span class="toc-text">用途</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AF%AD%E6%B3%95-v3"><span class="toc-number">1.5.2.</span> <span class="toc-text">语法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%82%E6%95%B0-v4"><span class="toc-number">1.5.3.</span> <span class="toc-text">参数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%94%E5%9B%9E%E5%80%BC-v2"><span class="toc-number">1.5.4.</span> <span class="toc-text">返回值</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A6%81%E6%B1%82-v2"><span class="toc-number">1.5.5.</span> <span class="toc-text">要求</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F-v3"><span class="toc-number">1.5.6.</span> <span class="toc-text">注意</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#GetBestInterfaceEx"><span class="toc-number">1.6.</span> <span class="toc-text">GetBestInterfaceEx</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%94%A8%E9%80%94-v6"><span class="toc-number">1.6.1.</span> <span class="toc-text">用途</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AF%AD%E6%B3%95-v4"><span class="toc-number">1.6.2.</span> <span class="toc-text">语法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%82%E6%95%B0-v5"><span class="toc-number">1.6.3.</span> <span class="toc-text">参数</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#WSASocketA"><span class="toc-number">1.7.</span> <span class="toc-text">WSASocketA</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%94%A8%E9%80%94-v7"><span class="toc-number">1.7.1.</span> <span class="toc-text">用途</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AF%AD%E6%B3%95-v5"><span class="toc-number">1.7.2.</span> <span class="toc-text">语法</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget" id="card-poem"><div id="poem_sentence"></div><div id="poem_info"><div id="poem_dynasty"></div><div id="poem_author"></div></div></div><script src="https://cdn.jsdelivr.net/npm/js-heo@1.0.11/poem/jinrishici.js" charset="utf-8"></script><script type="text/javascript">jinrishici.load(function(result) {
+var sentence = document.querySelector("#poem_sentence")
+var author = document.querySelector("#poem_author")
+var dynasty = document.querySelector("#poem_dynasty")
+var sentenceText = result.data.content
+sentenceText = sentenceText.substr(0, sentenceText.length - 1);
+sentence.innerHTML = sentenceText
+dynasty.innerHTML = result.data.origin.dynasty
+author.innerHTML = result.data.origin.author + '《' + result.data.origin.title + '》'
+});</script><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/my-hexo-blog/2023/07/03/%E6%97%A5%E5%B8%B8/%E6%88%91%E4%B8%80%E7%82%B9%E4%B9%9F%E4%B8%8D%E7%94%9F%E6%B0%94/" title="我一点也不生气"><img src="https://cdn.pixabay.com/photo/2014/11/12/11/39/graffiti-528180_1280.jpg" onerror="this.onerror=null;this.src='/my-hexo-blog/img/cover_p.jpeg'" alt="我一点也不生气"/></a><div class="content"><a class="title" href="/my-hexo-blog/2023/07/03/%E6%97%A5%E5%B8%B8/%E6%88%91%E4%B8%80%E7%82%B9%E4%B9%9F%E4%B8%8D%E7%94%9F%E6%B0%94/" title="我一点也不生气">我一点也不生气</a><time datetime="2023-07-03T02:59:01.042Z" title="发表于 2023-07-03 10:59:01">2023-07-03</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/my-hexo-blog/2023/06/30/tips%E6%95%B4%E7%90%86/github%E6%8B%89%E5%8F%96%E4%B8%8A%E4%BC%A0%E5%A4%B1%E8%B4%A5%E7%9A%84%E8%A7%A3%E5%86%B3/" title="github拉取上传失败的解决"><img src="https://www.shutterstock.com/image-vector/error-404-page-not-found-600w-2107093610.jpg" onerror="this.onerror=null;this.src='/my-hexo-blog/img/cover_p.jpeg'" alt="github拉取上传失败的解决"/></a><div class="content"><a class="title" href="/my-hexo-blog/2023/06/30/tips%E6%95%B4%E7%90%86/github%E6%8B%89%E5%8F%96%E4%B8%8A%E4%BC%A0%E5%A4%B1%E8%B4%A5%E7%9A%84%E8%A7%A3%E5%86%B3/" title="github拉取上传失败的解决">github拉取上传失败的解决</a><time datetime="2023-06-30T07:40:10.601Z" title="发表于 2023-06-30 15:40:10">2023-06-30</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/my-hexo-blog/2023/06/08/%E5%B9%B3%E5%8F%B0-Windows/Windows%E5%BC%80%E5%8F%91%E2%80%94%E2%80%94%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E6%9C%8D%E5%8A%A1/" title="Windows开发——管理系统服务 "><img src="https://cdn.pixabay.com/photo/2017/12/08/10/35/employee-3005501_640.jpg" onerror="this.onerror=null;this.src='/my-hexo-blog/img/cover_p.jpeg'" alt="Windows开发——管理系统服务 "/></a><div class="content"><a class="title" href="/my-hexo-blog/2023/06/08/%E5%B9%B3%E5%8F%B0-Windows/Windows%E5%BC%80%E5%8F%91%E2%80%94%E2%80%94%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E6%9C%8D%E5%8A%A1/" title="Windows开发——管理系统服务 ">Windows开发——管理系统服务 </a><time datetime="2023-06-08T05:26:52.637Z" title="发表于 2023-06-08 13:26:52">2023-06-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/my-hexo-blog/2023/05/22/qt%E5%BC%80%E5%8F%91/qt%E5%BC%80%E5%8F%91--4/" title="qt获取屏幕分辨率"><img src="https://cdn.pixabay.com/photo/2017/05/09/13/33/laptop-2298286_960_720.png" onerror="this.onerror=null;this.src='/my-hexo-blog/img/cover_p.jpeg'" alt="qt获取屏幕分辨率"/></a><div class="content"><a class="title" href="/my-hexo-blog/2023/05/22/qt%E5%BC%80%E5%8F%91/qt%E5%BC%80%E5%8F%91--4/" title="qt获取屏幕分辨率">qt获取屏幕分辨率</a><time datetime="2023-05-22T07:29:30.696Z" title="发表于 2023-05-22 15:29:30">2023-05-22</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/my-hexo-blog/2023/05/22/%E5%B9%B3%E5%8F%B0-Linux/root%E6%9D%83%E9%99%90%E5%90%AF%E5%8A%A8QtWebEngine/" title="root权限启动QtWebEngine"><img src="https://cdn.pixabay.com/photo/2017/05/09/13/33/laptop-2298286_960_720.png" onerror="this.onerror=null;this.src='/my-hexo-blog/img/cover_p.jpeg'" alt="root权限启动QtWebEngine"/></a><div class="content"><a class="title" href="/my-hexo-blog/2023/05/22/%E5%B9%B3%E5%8F%B0-Linux/root%E6%9D%83%E9%99%90%E5%90%AF%E5%8A%A8QtWebEngine/" title="root权限启动QtWebEngine">root权限启动QtWebEngine</a><time datetime="2023-05-22T07:12:45.668Z" title="发表于 2023-05-22 15:12:45">2023-05-22</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div id="ft"><div class="ft-item-1"><div class="t-top"><div class="t-t-l"><p class="ft-t t-l-t">美丽杰哥🧬</p><div class="bg-ad"><div>程序媛的命🙂</div><div class="btn-xz-box"><a class="btn-xz" target="_blank" rel="noopener" href="https://stellarium.org/">点击开启星辰之旅</a></div></div></div><div class="t-t-r"><p class="ft-t t-l-t">猜你想看💡</p><ul class="ft-links"><li><a href="/categories/qt">qt开发</a><a href="/categories/网络安全/">网络安全</a></li><li><a href="/about/">关于作者</a><a href="/archives/">文章归档</a></li><li><a href="/categories/">文章分类</a><a href="/tags/">文章标签</a></li></ul></div></div></div><div class="ft-item-2"><p class="ft-t">推荐友链⌛</p><div class="ft-img-group"><div class="img-group-item"><a href="https://115jiege.github.io/" title="美丽杰哥の博客"><img src="/pic/fl-1.jpeg" alt=""/></a></div></div></div></div><div class="copyright"><span><b>&copy;2022 - 2023</b></span><span><b>&nbsp;&nbsp;By Jiege</b></span></div><div id="workboard"></div><p id="ghbdages"><a class="github-badge" target="_blank" href="https://hexo.io/" style="margin-inline:5px" title="博客框架为Hexo_v6.3.0"><img src="https://sourcebucket.s3.ladydaily.com/badge/Frame-Hexo-blue.svg" alt=""/></a><a class="github-badge" target="_blank" href="/categories/魔改/" style="margin-inline:5px" title="主题版本GBTH1.0"><img src="https://img.shields.io/badge/Theme-GBTH1.0-blueviolet" alt=""/></a><a class="github-badge" target="_blank" href="https://vercel.com/" style="margin-inline:5px" title="本站采用多线部署，主线路托管于Vercel"><img src="https://sourcebucket.s3.ladydaily.com/badge/Hosted-Vercel-brightgreen.svg" alt=""/></a><a class="github-badge" target="_blank" href="https://tianli-blog.club/jsd/" style="margin-inline:5px" title="本网站源码由Github提供存储仓库"><img src=" https://sourcebucket.s3.ladydaily.com/badge/Source-Github-d021d6.svg" alt=""/></a></p></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="font-plus" type="button" title="放大字体"><i class="fas fa-plus"></i></button><button id="font-minus" type="button" title="缩小字体"><i class="fas fa-minus"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><a class="icon-V hidden" onclick="switchNightMode()" title="浅色和深色模式转换"><svg width="25" height="25" viewBox="0 0 1024 1024"><use id="modeicon" xlink:href="#icon-moon"></use></svg></a><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><div class="search-dialog__title" id="local-search-title">本地搜索</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div></div><hr/><div id="local-search-results"></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="/my-hexo-blog/js/utils.js"></script><script src="/my-hexo-blog/js/main.js"></script><script src="/my-hexo-blog/js/tw_cn.js"></script><script src="/my-hexo-blog/js/search/local-search.js"></script><script async="async">var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',preloader.endLoading())
+document.getElementById('loading-box').addEventListener('click',()=> {preloader.endLoading()})</script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: '',
+      appKey: '',
+      placeholder: 'Please leave your footprints',
+      avatar: 'monsterid',
+      meta: 'nick,mail,link'.split(','),
+      pageSize: '10',
+      lang: 'en',
+      recordIP: false,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: false,
+      path: window.location.pathname,
+      requiredFields: ["nick,mail"],
+      visitor: false
+    }, null))
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !true) {
+  if (true) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><script src="https://npm.elemecdn.com/jquery@latest/dist/jquery.min.js"></script><script src="https://pv.sohu.com/cityjson?ie=utf-8"></script><script defer src="/live2d-widget-master/autoload.js"></script><script src="/js/sun_moon.js" async></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/click-heart.min.js" async="async" mobile="false"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = [
+  'title',
+  '#config-diff',
+  '#body-wrap',
+  '#rightside-config-hide',
+  '#rightside-config-show',
+  '.js-pjax'
+]
+
+if (false) {
+  pjaxSelectors.unshift('meta[property="og:image"]', 'meta[property="og:title"]', 'meta[property="og:url"]')
+}
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // Analytics
+  if (false) {
+    MtaH5.pgv()
+  }
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+
+  typeof preloader === 'object' && preloader.endLoading()
+})
+
+
+document.addEventListener('pjax:send', function () {
+  typeof preloader === 'object' && preloader.initLoading()
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+})
+
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><div class="GalMenu GalDropDown"><div class="circle" id="gal"><div class="ring"><a class="menuItem" href="/my-hexo-blog/"><span>首页</span></a><a class="menuItem" href="/my-hexo-blog/archives/"><span>时间轴</span></a><a class="menuItem" href="/my-hexo-blog/tags/"><span>标签</span></a><a class="menuItem" href="/my-hexo-blog/categories/"><span>分类</span></a><a class="menuItem" href="/my-hexo-blog/link/"><span>友人帐</span></a><a class="menuItem" href="/my-hexo-blog/comments/"><span>留言板</span></a></div></div></div><script defer="defer" src="https://cdn.jsdelivr.net/gh/Akilarlxh/Akilarlxh.github.io@bf_3.3.0_12/js/custom/galmenu.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div><!-- hexo injector body_end start --> <script data-pjax>if(document.getElementById('recent-posts') && (location.pathname ==='/'|| '/' ==='all')){
+    var parent = document.getElementById('recent-posts');
+    var child = '<div class="recent-post-item" style="width:100%;height: auto"><div id="catalog_magnet"><div class="magnet_item"><a class="magnet_link" href="https://115jiege.github.io/my-hexo-blog/categories/国密/"><div class="magnet_link_context" style=""><span style="font-weight:500;flex:1">╮(╯▽╰)╭ gmssl,我有努力过 (2)</span><span style="padding:0px 4px;border-radius: 8px;"><i class="fas fa-arrow-circle-right"></i></span></div></a></div><div class="magnet_item"><a class="magnet_link" href="https://115jiege.github.io/my-hexo-blog/categories/qt/"><div class="magnet_link_context" style=""><span style="font-weight:500;flex:1">🙂 搞花里胡哨的qt (5)</span><span style="padding:0px 4px;border-radius: 8px;"><i class="fas fa-arrow-circle-right"></i></span></div></a></div><div class="magnet_item"><a class="magnet_link" href="https://115jiege.github.io/my-hexo-blog/categories/tips整理/"><div class="magnet_link_context" style=""><span style="font-weight:500;flex:1">😟 一步一坑 (8)</span><span style="padding:0px 4px;border-radius: 8px;"><i class="fas fa-arrow-circle-right"></i></span></div></a></div><div class="magnet_item"><a class="magnet_link" href="https://115jiege.github.io/my-hexo-blog/categories/平台-android/"><div class="magnet_link_context" style=""><span style="font-weight:500;flex:1">🤖 android robot (6)</span><span style="padding:0px 4px;border-radius: 8px;"><i class="fas fa-arrow-circle-right"></i></span></div></a></div><div class="magnet_item"><a class="magnet_link" href="https://115jiege.github.io/my-hexo-blog/categories/平台-Linux/"><div class="magnet_link_context" style=""><span style="font-weight:500;flex:1">😌 Linux，我永远的依靠 (6)</span><span style="padding:0px 4px;border-radius: 8px;"><i class="fas fa-arrow-circle-right"></i></span></div></a></div><div class="magnet_item"><a class="magnet_link" href="https://115jiege.github.io/my-hexo-blog/categories/平台-Windows/"><div class="magnet_link_context" style=""><span style="font-weight:500;flex:1">(・∀・*) Windows好难 (4)</span><span style="padding:0px 4px;border-radius: 8px;"><i class="fas fa-arrow-circle-right"></i></span></div></a></div><a class="magnet_link_more"  href="https://115jiege.github.io/my-hexo-blog/categories" style="flex:1;text-align: center;margin-bottom: 10px;">查看更多...</a></div></div>';
+    console.log('已挂载magnet')
+    parent.insertAdjacentHTML("afterbegin",child)}
+     </script><style>#catalog_magnet{flex-wrap: wrap;display: flex;width:100%;justify-content:space-between;padding: 10px 10px 0 10px;align-content: flex-start;}.magnet_item{flex-basis: calc(33.333333333333336% - 5px);background: #9b9ab8;margin-bottom: 10px;border-radius: 8px;transition: all 0.2s ease-in-out;}.magnet_item:hover{background: #8a89a3}.magnet_link_more{color:#555}.magnet_link{color:white}.magnet_link:hover{color:undefined}@media screen and (max-width: 600px) {.magnet_item {flex-basis: 100%;}}.magnet_link_context{display:flex;padding: 10px;font-size:16px;transition: all 0.2s ease-in-out;}.magnet_link_context:hover{padding: 10px 20px;}</style>
+    <style></style><script data-pjax>function history_calendar_injector_config(){
+                var parent_div_git = document.getElementsByClassName('sticky_layout')[0];
+                var item_html = '<div class="card-widget card-history"><div class="card-content"><div class="item-headline"><i class="fas fa-clock fa-spin"></i><span>那年今日</span></div><div id="history-baidu" style="height: 100px;overflow: hidden"><div class="history_swiper-container" id="history-container" style="width: 100%;height: 100%"><div class="swiper-wrapper" id="history_container_wrapper" style="height:20px"></div></div></div></div>';
+                console.log('已挂载history_calendar')
+                // parent_div_git.innerHTML=item_html+parent_div_git.innerHTML // 无报错，但不影响使用(支持pjax跳转)
+                parent_div_git.insertAdjacentHTML("afterbegin",item_html) // 有报错，但不影响使用(支持pjax跳转)
+            }if( document.getElementsByClassName('sticky_layout')[0] && (location.pathname ==='all'|| 'all' ==='all')){
+
+            history_calendar_injector_config()
+        } </script><script data-pjax  src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script><script data-pjax src="https://cdn.jsdelivr.net/gh/Zfour/Butterfly-card-history/baiduhistory/js/main.js"></script><!-- hexo injector body_end end --></body></html><!-- 雪花特效 -->
+<script type="text/javascript" src="\js\bg_snow.js"></script>
+<!-- 电子时钟 -->
+<script src="/clock/js/clock.js"></script>
+<link rel="stylesheet" href="/clock/css/clock.css">
+<!-- 趣味标题 -->
+<script src="/js/funny-title.js"></script>
+<!-- 运行时间 -->
+<script defer src="/js/runtime.js"></script>
