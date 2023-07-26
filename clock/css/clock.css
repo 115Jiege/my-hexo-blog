@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'PermanentMarker'; /*a name to be used later*/
-    src: url('/clock/font/PermanentMarker.ttf'); /*URL to font*/
+    src: url('../font/PermanentMarker.ttf'); /*URL to font*/
 }
 #hexo_electric_clock{
 	padding:20px
