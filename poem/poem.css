@@ -1,7 +1,7 @@
 /* 古诗词卡片 */
 @font-face {
     font-family: 'YunFengHanChan'; /*a name to be used later*/
-    src: url('/font/云峰寒蝉体.ttf'); /*URL to font*/
+    src: url('./云峰寒蝉体.ttf'); /*URL to font*/
 }
 
 #card-poem{
